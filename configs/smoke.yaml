@@ -1,0 +1,65 @@
+experiment:
+  name: fedcernn_smoke
+  repetitions: 1
+  base_seed: 1701
+  output_directory: code/results/smoke
+  torch_threads: 1
+  fail_fast: true
+  retry_errors: true
+
+dataset: simulation
+
+simulation:
+  n_train: 128
+  n_test: 64
+  n_clients: 4
+  dgps: [smooth_additive]
+  errors: [normal]
+
+model:
+  hidden_dims: [8, 4]
+  taus: [0.1, 0.5, 0.9]
+
+optimization:
+  l2_lambda: 0.0001
+  adam_steps: 3
+  adam_lr: 0.01
+  lbfgs_steps: 1
+  lbfgs_lr: 1.0
+  tolerance: 1.0e-5
+  history_size: 5
+
+fedcernn:
+  rounds: 1
+  surrogate_optimizer:
+    profile: smoke_budget
+    adam_steps: 2
+    adam_lr: 0.002
+    lbfgs_steps: 1
+    lbfgs_lr: 0.2
+    tolerance: 1.0e-5
+
+baselines:
+  rounds: 2
+  local_steps: 2
+  local_lr: 0.01
+  fedprox_mu: 0.01
+  local_optimizer:
+    adam_steps: 2
+    adam_lr: 0.01
+    lbfgs_steps: 1
+    lbfgs_lr: 1.0
+    tolerance: 1.0e-5
+
+methods:
+  - FedCERNN
+  - Centralized CERNN
+  - Host CERNN
+  - one-shot FedAvg
+  - multi-round FedAvg
+  - FedProx
+  - SCAFFOLD
+  - DCERNN
+
+sensitivity:
+  enabled: false

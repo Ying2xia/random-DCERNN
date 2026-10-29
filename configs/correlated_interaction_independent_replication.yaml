@@ -1,0 +1,93 @@
+# Independent replication of the correlated-interaction mechanism.  The
+# mechanism and all tuning values are fixed before this run; this output is
+# separate from the five-repetition exploratory screen.
+experiment:
+  name: correlated_interaction_independent_replication
+  repetitions: 100
+  base_seed: 20260829
+  output_directory: code/results/correlated_interaction_independent_replication
+  torch_threads: 1
+  fail_fast: false
+  retry_errors: true
+
+dataset: simulation
+simulation:
+  n_train: 100000
+  n_test: 5000
+  n_clients: 20
+  dgps: [correlated_interaction]
+  errors: [normal, t3, centered_chi2, contaminated_normal]
+  partition: {kind: iid}
+
+model:
+  hidden_dims: [32, 16]
+  taus: [0.1, 0.3, 0.5, 0.7, 0.9]
+
+optimization:
+  l2_lambda: 0.0001
+  adam_steps: 100
+  adam_lr: 0.01
+  lbfgs_steps: 200
+  lbfgs_lr: 1.0
+  tolerance: 1.0e-6
+  history_size: 50
+  stepwise_lbfgs: true
+  select_min_gradient_checkpoint: true
+
+fedcernn:
+  rounds: 3
+  host_optimizer:
+    adam_steps: 200
+    adam_lr: 0.01
+    lbfgs_steps: 400
+    lbfgs_lr: 1.0
+    tolerance: 1.0e-6
+    history_size: 50
+  surrogate_optimizer:
+    adam_steps: 3
+    adam_lr: 0.001
+    lbfgs_steps: 5
+    lbfgs_lr: 0.02
+    tolerance: 1.0e-6
+    history_size: 10
+    stepwise_lbfgs: true
+    select_min_gradient_checkpoint: true
+    max_rms_parameter_change: 0.005
+
+baselines:
+  rounds: 5
+  local_steps: 20
+  local_lr: 0.01
+  fedprox_mu: 0.01
+  cease_alpha: 0.01
+  feddane_mu: 0.01
+  local_optimizer:
+    adam_steps: 3
+    adam_lr: 0.001
+    lbfgs_steps: 5
+    lbfgs_lr: 0.02
+    tolerance: 1.0e-6
+    history_size: 10
+    stepwise_lbfgs: true
+    select_min_gradient_checkpoint: true
+    max_rms_parameter_change: 0.005
+
+participation:
+  rate: 1.0
+  seed: 20260829
+
+methods:
+  - FedCERNN
+  - CSL-CERNN
+  - CEASE-CERNN
+  - DANE-CERNN
+  - FedDANE-CERNN
+  - Centralized CERNN
+  - Host CERNN
+  - one-shot FedAvg
+  - multi-round FedAvg
+  - FedProx
+  - SCAFFOLD
+  - DCERNN
+
+sensitivity: {enabled: false}

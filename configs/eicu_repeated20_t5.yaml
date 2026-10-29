@@ -1,0 +1,70 @@
+experiment:
+  name: fedcernn_eicu_repeated20_t5
+  repetitions: 20
+  base_seed: 2024
+  output_directory: code/results/eicu_repeated20_t5
+  torch_threads: 1
+
+dataset: eicu
+
+data:
+  matrix_path: code/data/interim/eicu/restricted_feature_matrices.npz
+  n_clients: 20
+  feature_window_minutes: 1440
+  target_cap_days: null
+
+model:
+  hidden_dims: [32, 16]
+  taus: [0.1, 0.3, 0.5, 0.7, 0.9]
+
+optimization:
+  l2_lambda: 0.0001
+  adam_steps: 50
+  adam_lr: 0.01
+  lbfgs_steps: 20
+  lbfgs_lr: 1.0
+  tolerance: 1.0e-7
+  history_size: 50
+  stepwise_lbfgs: true
+  select_min_gradient_checkpoint: true
+
+fedcernn:
+  rounds: 5
+  surrogate_optimizer:
+    profile: corrected_standard_hostbase
+    adam_steps: 3
+    adam_lr: 0.001
+    lbfgs_steps: 5
+    lbfgs_lr: 0.02
+    tolerance: 1.0e-6
+    history_size: 10
+    stepwise_lbfgs: true
+    select_min_gradient_checkpoint: true
+    max_rms_parameter_change: 0.005
+
+baselines:
+  rounds: 5
+  local_steps: 20
+  local_lr: 0.01
+  fedprox_mu: 0.01
+  cease_alpha: 0.01
+  feddane_mu: 0.01
+  local_optimizer:
+    adam_steps: 30
+    adam_lr: 0.01
+    lbfgs_steps: 10
+    lbfgs_lr: 1.0
+    tolerance: 1.0e-7
+
+methods:
+  - FedCERNN
+  - Centralized CERNN
+  - Host CERNN
+  - one-shot FedAvg
+  - multi-round FedAvg
+  - FedProx
+  - SCAFFOLD
+  - DCERNN
+  - CEASE-CERNN
+  - DANE-CERNN
+  - FedDANE-CERNN

@@ -1,0 +1,64 @@
+# Validation-selected solvers; legacy experiment directories are untouched.
+experiment:
+  name: meps_solver_revision
+  repetitions: 10
+  base_seed: 2023
+  output_directory: code/results/meps_solver_revision
+  torch_threads: 1
+  fail_fast: true
+  retry_errors: true
+  progress: true
+dataset: meps
+data:
+  path: code/data/raw/meps/h251.dta
+  n_clients: 10
+  target_transform: raw
+model:
+  hidden_dims: [32, 16]
+  taus: [0.1, 0.3, 0.5, 0.7, 0.9]
+optimization:
+  l2_lambda: 0.0001
+  adam_steps: 50
+  adam_lr: 0.01
+  lbfgs_steps: 20
+  lbfgs_lr: 1.0
+  tolerance: 1.0e-7
+fedcernn:
+  rounds: 5
+  surrogate_optimizer:
+    profile: validation_selected_budget
+    adam_steps: 20
+    adam_lr: 0.0002
+    lbfgs_steps: 5
+    lbfgs_lr: 0.02
+    tolerance: 1.0e-7
+    history_size: 10
+baselines:
+  rounds: 5
+  local_steps: 20
+  local_lr: 0.01
+  fedprox_mu: 0.01
+  cease_alpha: 0.01
+  feddane_mu: 0.01
+  local_optimizer: {adam_steps: 30, adam_lr: 0.01, lbfgs_steps: 10, lbfgs_lr: 1.0, tolerance: 1.0e-7}
+  scaffold_solver: sgd
+  scaffold_sgd_steps: 100
+  scaffold_sgd_lr: 0.03
+  corrected_local_optimizers:
+    DANE-CERNN: {adam_steps: 30, adam_lr: 0.003, lbfgs_steps: 0, tolerance: 1.0e-7}
+  validation_candidates:
+    DANE-CERNN:
+      - name: adam30_lr003
+        baselines:
+          corrected_local_optimizers:
+            DANE-CERNN: {adam_steps: 30, adam_lr: 0.003, lbfgs_steps: 0, tolerance: 1.0e-7}
+      - name: adam30_lr01
+        baselines:
+          corrected_local_optimizers:
+            DANE-CERNN: {adam_steps: 30, adam_lr: 0.01, lbfgs_steps: 0, tolerance: 1.0e-7}
+    SCAFFOLD:
+      - name: sgd100_lr03
+        baselines: {scaffold_solver: sgd, scaffold_sgd_steps: 100, scaffold_sgd_lr: 0.03}
+      - name: sgd100_lr10
+        baselines: {scaffold_solver: sgd, scaffold_sgd_steps: 100, scaffold_sgd_lr: 0.1}
+methods: [FedCERNN, Centralized CERNN, Host CERNN, one-shot FedAvg, multi-round FedAvg, FedProx, SCAFFOLD, DCERNN, CEASE-CERNN, DANE-CERNN, FedDANE-CERNN]

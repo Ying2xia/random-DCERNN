@@ -1,0 +1,72 @@
+experiment:
+  name: csl_validation_selected_v3
+  repetitions: 100
+  base_seed: 2026091173
+  output_directory: results/csl_validation_selected_standard_runner_v3
+  torch_threads: 1
+  fail_fast: false
+  retry_errors: true
+dataset: simulation
+seed_policy: shared_primary_v1
+simulation:
+  n_train: 100000
+  n_test: 5000
+  n_clients: 20
+  dgps:
+  - smooth_additive
+  - correlated_interaction
+  - sparse_interaction
+  errors:
+  - normal
+  - t3
+  - centered_chi2
+  - contaminated_normal
+  partition:
+    kind: iid
+model:
+  hidden_dims:
+  - 32
+  - 16
+  taus:
+  - 0.1
+  - 0.3
+  - 0.5
+  - 0.7
+  - 0.9
+optimization:
+  l2_lambda: 0.001
+  adam_steps: 400
+  adam_lr: 0.01
+  lbfgs_steps: 800
+  lbfgs_lr: 1.0
+  tolerance: 1.0e-06
+  history_size: 100
+  stepwise_lbfgs: false
+  select_min_gradient_checkpoint: false
+fedcernn:
+  rounds: 5
+  host_optimizer:
+    adam_steps: 200
+    adam_lr: 0.01
+    lbfgs_steps: 400
+    lbfgs_lr: 1.0
+    tolerance: 1.0e-06
+    history_size: 50
+  surrogate_optimizer:
+    adam_steps: 80
+    adam_lr: 0.002
+    lbfgs_steps: 20
+    lbfgs_lr: 0.03
+    tolerance: 1.0e-06
+    history_size: 20
+    stepwise_lbfgs: true
+    select_min_gradient_checkpoint: true
+    max_rms_parameter_change: 0.03
+    project_rms_parameter_change: true
+participation:
+  rate: 1.0
+  seed: 20260811
+methods:
+- FedCERNN
+sensitivity:
+  enabled: false
