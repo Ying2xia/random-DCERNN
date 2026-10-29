@@ -1,0 +1,98 @@
+experiment:
+  name: hierarchical_sensitivity_solver_high
+  repetitions: 100
+  base_seed: 2026091502
+  output_directory: code/results/hierarchical_sensitivity_r100/runs/solver_high
+  torch_threads: 1
+  fail_fast: true
+  retry_errors: true
+  progress: true
+dataset: simulation
+seed_policy: shared_primary_v1
+simulation:
+  n_train: 100000
+  n_test: 5000
+  n_clients: 20
+  partition:
+    kind: iid
+  dgp: hierarchical_composition
+  error: contaminated_normal
+model:
+  hidden_dims:
+  - 32
+  - 16
+  taus:
+  - 0.1
+  - 0.3
+  - 0.5
+  - 0.7
+  - 0.9
+optimization:
+  l2_lambda: 0.001
+  adam_steps: 400
+  adam_lr: 0.01
+  lbfgs_steps: 800
+  lbfgs_lr: 1.0
+  tolerance: 1.0e-06
+  history_size: 100
+  stepwise_lbfgs: false
+  select_min_gradient_checkpoint: false
+fedcernn:
+  rounds: 5
+  host_optimizer:
+    adam_steps: 200
+    adam_lr: 0.01
+    lbfgs_steps: 400
+    lbfgs_lr: 1.0
+    tolerance: 1.0e-06
+    history_size: 50
+  surrogate_optimizer:
+    adam_steps: 160
+    adam_lr: 0.002
+    lbfgs_steps: 40
+    lbfgs_lr: 0.03
+    tolerance: 1.0e-06
+    history_size: 20
+    stepwise_lbfgs: true
+    select_min_gradient_checkpoint: true
+    max_rms_parameter_change: 0.03
+    project_rms_parameter_change: true
+baselines:
+  rounds: 5
+  local_steps: 300
+  local_lr: 0.01
+  fedprox_mu: 0.01
+  cease_alpha: 0.01
+  feddane_mu: 0.01
+  local_optimizer:
+    adam_steps: 3
+    adam_lr: 0.001
+    lbfgs_steps: 5
+    lbfgs_lr: 0.02
+    tolerance: 1.0e-06
+    history_size: 10
+    stepwise_lbfgs: true
+    select_min_gradient_checkpoint: true
+    max_rms_parameter_change: 0.005
+  predictive_local_optimizer:
+    adam_steps: 300
+    adam_lr: 0.003
+    lbfgs_steps: 0
+    lbfgs_lr: 1.0
+    tolerance: 1.0e-07
+    history_size: 20
+  predictive_local_optimizers:
+    SCAFFOLD:
+      adam_steps: 100
+      adam_lr: 0.003
+      lbfgs_steps: 0
+      lbfgs_lr: 1.0
+      tolerance: 1.0e-07
+      history_size: 20
+participation:
+  rate: 1.0
+  seed: 20260811
+methods:
+- FedCERNN
+sensitivity:
+  enabled: false
